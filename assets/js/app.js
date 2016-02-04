@@ -14,6 +14,9 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
         .when('/category/:category/', {
             templateUrl: swift.templates + '/index.html',
             controller: 'Category'
+        })
+        .otherwise({
+            templateUrl: swift.templates + '/404.html'
         });
 
     $locationProvider.html5Mode(true);
