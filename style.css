@@ -8,3 +8,24 @@
  * License URI: https://opensource.org/licenses/MIT
  */
 
+body {
+    font-family: Lato, sans-serif;
+    font-size: 15px;
+    line-height: 1.4;
+    margin: 0;
+}
+
+.container {
+    width: 1000px;
+    margin: 0 auto;
+}
+
+.site-header, .site-main, .site-footer {
+    padding: 20px 0;
+}
+.site-header {
+    background-color: #eeeeee;
+}
+.site-header, .site-footer {
+    background-color: #eeeeee;
+}
