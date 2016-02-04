@@ -44,3 +44,8 @@ body {
     clear: both;
     display: block;
 }
+
+.active a {
+    font-weight: bold;
+    color: red;
+}

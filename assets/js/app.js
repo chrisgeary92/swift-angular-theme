@@ -47,6 +47,7 @@ app.controller('Category', ['$scope', '$http', '$routeParams', function($scope, 
     });
 
     $http.get(swift.root + '/wp-json/wp/v2/categories?slug=' + $routeParams.category).success(function(res) {
+        $scope.current_category = res[0];
         document.querySelector('title').innerHTML = 'Category: ' + res[0].name + ' | ' + swift.site_name;
         $http.get(swift.root + '/wp-json/wp/v2/posts?filter[category_name]=' + res[0].slug).success(function(res) {
             $scope.posts = res;

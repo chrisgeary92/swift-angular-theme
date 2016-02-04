@@ -14,11 +14,12 @@
     <swift-search-form></swift-search-form>
 
     <h4>Categories</h4>
-
+    
     <ul>
-        <li ng-repeat="category in categories">
+        <li ng-repeat="category in categories" ng-class="{ active: category.slug == current_category.slug }">
             <a href="{{ category.link }}" ng-bind-html="category.name"></a>
         </li>
     </ul>
+
 
 </div>
