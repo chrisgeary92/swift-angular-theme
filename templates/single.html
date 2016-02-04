@@ -1,2 +1,2 @@
-<h1>{{ post.title.rendered }}</h1>
+<h1 ng-bind-html="post.title.rendered | toTrusted"></h1>
 <div ng-bind-html="post.content.rendered | toTrusted"></div>
