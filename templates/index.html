@@ -1,6 +1,6 @@
 <div class="content">
     
-    <article ng-repeat="post in posts" class="entry entry-post">
+    <article ng-repeat="post in posts" class="entry entry-post entry-excerpt">
         <header class="entry-header">
             <h2 class="entry-title"><a href="{{ post.link }}" ng-bind-html="post.title.rendered | toTrusted"></a></h2>
         </header>

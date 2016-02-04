@@ -1,2 +1,6 @@
-<h1 ng-bind-html="post.title.rendered | toTrusted"></h1>
-<div ng-bind-html="post.content.rendered | toTrusted"></div>
+<article class="entry entry-post entry-single">
+    <header class="entry-header">
+        <h1 ng-bind-html="post.title.rendered | toTrusted"></h1>
+    </header>
+    <div ng-bind-html="post.content.rendered | toTrusted"></div>
+</article>

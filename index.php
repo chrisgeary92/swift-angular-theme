@@ -18,6 +18,7 @@
         <header class="site-header">
             <div class="container">
                 <h1><a href="<?= esc_url(home_url()); ?>"><?php bloginfo('name'); ?></a></h1>
+                <p><?php bloginfo('description'); ?></p>
             </div>
         </header>
 

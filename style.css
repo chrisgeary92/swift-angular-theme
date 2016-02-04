@@ -23,10 +23,8 @@ body {
 .site-header, .site-main, .site-footer {
     padding: 20px 0;
 }
-.site-header {
-    background-color: #eeeeee;
-}
-.site-header, .site-footer {
+
+.site-header, .site-footer, pre, code {
     background-color: #eeeeee;
 }
 
@@ -48,4 +46,12 @@ body {
 .active a {
     font-weight: bold;
     color: red;
+}
+
+.entry-post {
+    margin-bottom: 60px;
+}
+
+pre {
+    padding: 15px;
 }
