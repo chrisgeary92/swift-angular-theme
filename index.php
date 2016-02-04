@@ -22,7 +22,7 @@
         </header>
 
         <main class="site-main">
-            <div class="container">
+            <div class="container clearfix">
                 <div ng-view></div>
             </div>
         </main>

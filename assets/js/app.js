@@ -1,34 +1,56 @@
 var app = angular.module('app', ['ngRoute', 'ngSanitize']);
 
-app.config(function($routeProvider, $locationProvider) {
+app.config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
 
     $routeProvider
         .when('/', {
-            templateUrl: swift.templates + '/home.html',
+            templateUrl: swift.templates + '/index.html',
             controller: 'Home'
         })
         .when('/:slug/', {
             templateUrl: swift.templates + '/single.html',
             controller: 'Single'
+        })
+        .when('/category/:category/', {
+            templateUrl: swift.templates + '/index.html',
+            controller: 'Category'
         });
 
     $locationProvider.html5Mode(true);
 
-});
+}]);
 
-app.controller('Home', function($scope, $http, $routeParams) {
+app.controller('Home', ['$scope', '$http', function($scope, $http, $routeParams) {
+    $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
+        $scope.categories = res;
+    });
     $http.get(swift.root + '/wp-json/wp/v2/posts').success(function(res) {
         $scope.posts = res;
         document.querySelector('title').innerHTML = 'Home | ' + swift.site_name;
     });
-});
+}]);
 
-app.controller('Single', function($scope, $http, $routeParams) {
+app.controller('Single', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
     $http.get(swift.root + '/wp-json/wp/v2/posts?filter[name]=' + $routeParams.slug).success(function(res) {
         $scope.post = res[0];
         document.querySelector('title').innerHTML = res[0].title.rendered + ' | ' + swift.site_name;
     });
-});
+}]);
+
+app.controller('Category', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
+    
+    $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
+        $scope.categories = res;
+    });
+
+    $http.get(swift.root + '/wp-json/wp/v2/categories?slug=' + $routeParams.category).success(function(res) {
+        document.querySelector('title').innerHTML = 'Category: ' + res[0].name + ' | ' + swift.site_name;
+        $http.get(swift.root + '/wp-json/wp/v2/posts?filter[category_name]=' + res[0].slug).success(function(res) {
+            $scope.posts = res;
+        });
+    });
+
+}]);
 
 app.filter('toTrusted', ['$sce', function($sce) {
     return function(text) {

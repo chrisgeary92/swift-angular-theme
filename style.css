@@ -29,3 +29,18 @@ body {
 .site-header, .site-footer {
     background-color: #eeeeee;
 }
+
+.content {
+    width: 65%;
+    float: left;
+}
+.sidebar {
+    width: 35%;
+    float: right;
+}
+
+.clearfix:after {
+    content: '';
+    clear: both;
+    display: block;
+}
