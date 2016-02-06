@@ -5,7 +5,7 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
     $routeProvider
         .when('/', {
             templateUrl: swift.templates + '/index.html',
-            controller: 'Home'
+            controller: 'Index'
         })
         .when('/:slug/', {
             templateUrl: swift.templates + '/single.html',
@@ -15,6 +15,14 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
             templateUrl: swift.templates + '/index.html',
             controller: 'Category'
         })
+        .when('/category/:category/page/:page/', {
+            templateUrl: swift.templates + '/index.html',
+            controller: 'Category'
+        })
+        .when('/page/:page/', {
+            templateUrl: swift.templates + '/index.html',
+            controller: 'Index'
+        })
         .otherwise({
             templateUrl: swift.templates + '/404.html'
         });
@@ -23,14 +31,52 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
 
 }]);
 
-app.controller('Home', ['$scope', '$http', function($scope, $http, $routeParams) {
+app.controller('Index', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
     $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
         $scope.categories = res;
     });
-    $http.get(swift.root + '/wp-json/wp/v2/posts').success(function(res) {
+
+    var currentPage = !$routeParams.page ? 1 : parseInt($routeParams.page);
+
+    var request = swift.root + '/wp-json/wp/v2/posts?per_page=4';
+
+    if ($routeParams.page) {
+        request += '&page=' + $routeParams.page;
+    }
+
+    $http.get(request).success(function(res, status, headers) {
         $scope.posts = res;
-        document.querySelector('title').innerHTML = 'Home | ' + swift.site_name;
+        $scope.currentPage = currentPage;
+        $scope.totalPages = headers('x-wp-totalpages');
     });
+}]);
+
+app.controller('Category', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
+    $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
+        $scope.categories = res;
+    });
+
+
+    $http.get(swift.root + '/wp-json/wp/v2/categories?slug=' + $routeParams.category).success(function(res) {
+        $scope.current_category = res[0];
+        document.querySelector('title').innerHTML = 'Category: ' + res[0].name + ' | ' + swift.site_name;
+
+        var currentPage = !$routeParams.page ? 1 : parseInt($routeParams.page);
+
+        var request = swift.root + '/wp-json/wp/v2/posts?per_page=4&filter[category_name]=' + res[0].slug;
+
+        if ($routeParams.page) {
+            request += '&page=' + $routeParams.page;
+        }
+
+        $http.get(request).success(function(res, status, headers) {
+            $scope.posts = res;
+            $scope.currentPage = currentPage;
+            $scope.totalPages = headers('x-wp-totalpages');
+        });
+    });
+
+
 }]);
 
 app.controller('Single', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
@@ -38,22 +84,6 @@ app.controller('Single', ['$scope', '$http', '$routeParams', function($scope, $h
         $scope.post = res[0];
         document.querySelector('title').innerHTML = res[0].title.rendered + ' | ' + swift.site_name;
     });
-}]);
-
-app.controller('Category', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
-    
-    $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
-        $scope.categories = res;
-    });
-
-    $http.get(swift.root + '/wp-json/wp/v2/categories?slug=' + $routeParams.category).success(function(res) {
-        $scope.current_category = res[0];
-        document.querySelector('title').innerHTML = 'Category: ' + res[0].name + ' | ' + swift.site_name;
-        $http.get(swift.root + '/wp-json/wp/v2/posts?filter[category_name]=' + res[0].slug).success(function(res) {
-            $scope.posts = res;
-        });
-    });
-
 }]);
 
 app.filter('toTrusted', ['$sce', function($sce) {
@@ -71,10 +101,29 @@ app.directive('swiftSearchForm', function() {
                 s: ''
             };
             $scope.search = function() {
-                $http.get(swift.root + '/wp-json/wp/v2/posts?filter[s]=' + $scope.filter.s).success(function(res) {
+                $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=-1&filter[s]=' + $scope.filter.s).success(function(res) {
                     $scope.posts = res;
                 });
             };
         }
+    };
+});
+
+app.directive('postsNavLink', function() {
+    return {
+        restrict: 'E',
+        templateUrl: swift.templates + '/posts-nav-link.html',
+        controller: ['$scope', '$element', '$routeParams', function($scope, $element, $routeParams) {
+            var currentPage = !$routeParams.page ? 1 : parseInt($routeParams.page),
+                linkPrefix = !$routeParams.category ? 'page/' : 'category/' + $routeParams.category + '/page/';
+
+            $scope.postsNavLink = {
+                prevLink: linkPrefix + (currentPage - 1),
+                nextLink: linkPrefix + (currentPage + 1),
+                sep: !$element.attr('sep')? '|' : $element.attr('sep'),
+                prevLabel: !$element.attr('prev-label') ? 'Previous' : $element.attr('prev-label'),
+                nextLabel: !$element.attr('next-label') ? 'Next' : $element.attr('next-label')
+            };
+        }]
     };
 });

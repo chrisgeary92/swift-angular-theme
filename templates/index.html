@@ -7,6 +7,8 @@
         <div ng-bind-html="post.excerpt.rendered | toTrusted"></div>
     </article>
 
+    <posts-nav-link prev-label="&laquo; Previous Page" next-label="Next Page &raquo;"></posts-nav-link>
+
 </div>
 
 <div class="sidebar">
@@ -20,6 +22,5 @@
             <a href="{{ category.link }}" ng-bind-html="category.name"></a>
         </li>
     </ul>
-
 
 </div>
