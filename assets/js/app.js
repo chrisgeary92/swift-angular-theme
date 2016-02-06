@@ -24,17 +24,17 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
             controller: 'Index'
         })
         .otherwise({
-            templateUrl: swift.templates + '/404.html'
+            templateUrl: swift.templates + '/404.html',
+            controller: '404'
         });
 
     $locationProvider.html5Mode(true);
 
 }]);
 
-app.controller('Index', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
-    $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
-        $scope.categories = res;
-    });
+app.controller('Index', ['$scope', '$http', '$routeParams', '$wpService', function($scope, $http, $routeParams, $wpService) {
+    $wpService.getAllCategories();
+    $scope.data = $wpService;
 
     var currentPage = !$routeParams.page ? 1 : parseInt($routeParams.page);
 
@@ -51,11 +51,13 @@ app.controller('Index', ['$scope', '$http', '$routeParams', function($scope, $ht
     });
 }]);
 
-app.controller('Category', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
-    $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
-        $scope.categories = res;
-    });
+app.controller('404', function() {
+    document.querySelector('title').innerHTML = 'Page not found | ' + swift.site_name;
+});
 
+app.controller('Category', ['$scope', '$http', '$routeParams', '$wpService', function($scope, $http, $routeParams, $wpService) {
+    $wpService.getAllCategories();
+    $scope.data = $wpService;
 
     $http.get(swift.root + '/wp-json/wp/v2/categories?slug=' + $routeParams.category).success(function(res) {
         $scope.current_category = res[0];
@@ -127,3 +129,20 @@ app.directive('postsNavLink', function() {
         }]
     };
 });
+
+app.factory('$wpService', ['$http', function($http) {
+    var WpService = {
+        categories: []
+    };
+
+    WpService.getAllCategories = function() {
+        if (WpService.categories.length) {
+            return;
+        }
+        return $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
+            WpService.categories = res;
+        });
+    };
+
+    return WpService;
+}]);
