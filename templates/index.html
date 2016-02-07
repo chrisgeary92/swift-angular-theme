@@ -1,4 +1,6 @@
 <div class="content">
+
+    <h1 ng-if="data.pageTitle" class="section-title">{{ data.pageTitle }}</h1>
     
     <article ng-repeat="post in data.posts" class="entry entry-post entry-excerpt">
         <header class="entry-header">
@@ -7,20 +9,24 @@
         <div ng-bind-html="post.excerpt.rendered | toTrusted"></div>
     </article>
 
+    <p ng-if="!data.posts.length">Sorry, no posts matched your criteria.</p>
+
     <posts-nav-link prev-label="&laquo; Previous Page" next-label="Next Page &raquo;"></posts-nav-link>
 
 </div>
 
 <div class="sidebar">
 
-    <swift-search-form></swift-search-form>
-
     <h4>Categories</h4>
     
     <ul>
-        <li ng-repeat="category in data.categories" ng-class="{ active: category.slug == current_category.slug }">
+        <li ng-repeat="category in data.categories">
             <a href="{{ category.link }}" ng-bind-html="category.name"></a>
         </li>
     </ul>
+
+    <h4>Search</h4>
+    
+    <swift-search-form></swift-search-form>
 
 </div>

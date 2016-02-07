@@ -102,13 +102,19 @@ app.factory('$wpService', ['$http', function($http) {
         categories: [],
         posts: [],
         currentPage: 1,
-        totalPages: 1
+        totalPages: 1,
+        pageTitle: ''
     };
 
     function _setArchivePage(posts, page, headers) {
         WpService.posts = posts;
         WpService.currentPage = page;
         WpService.totalPages = headers('x-wp-totalpages');
+    }
+
+    function _setPageTitle(name, page) {
+        page = !page ? 1 : parseInt(page);
+        WpService.pageTitle = name + (page > 1 ? ' (Page: ' + page + ')' : '');
     }
 
     WpService.getAllCategories = function() {
@@ -123,21 +129,28 @@ app.factory('$wpService', ['$http', function($http) {
     WpService.getPosts = function(page) {
         page = !page ? 1 : parseInt(page);
         return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&page=' + page).success(function(res, status, headers) {
+            _setPageTitle('', page);
             _setArchivePage(res, page, headers);
-        });
-    };
-
-    WpService.getSearchResults = function(s) {
-        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=-1&filter[s]=' + s).success(function(res, status, headers) {
-            _setArchivePage(res, 1, headers);
         });
     };
 
     WpService.getPostsInCategory = function(category, page) {
         page = !page ? 1 : parseInt(page);
-        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&filter[category_name]=' + category.name + '&page=' + page).success(function(res, status, headers) {
+        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&filter[category_name]=' + category.slug + '&page=' + page).success(function(res, status, headers) {
+            _setPageTitle('Category: ' + category.name, page);
             _setArchivePage(res, page, headers);
         });
+    };
+
+    WpService.getSearchResults = function(s) {
+        if (s.length) {
+            return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=0&filter[s]=' + s).success(function(res, status, headers) {
+                _setPageTitle('Search: ' + s);
+                _setArchivePage(res, 1, headers);
+            });
+        }
+
+        WpService.getPosts();
     };
 
     return WpService;

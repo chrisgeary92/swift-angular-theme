@@ -13,25 +13,19 @@
 </head>
 <body>
 
-    <div ng-app="app">
+    <div ng-app="app" class="container">
 
-        <header class="site-header">
-            <div class="container">
-                <h1><a href="<?= esc_url(home_url()); ?>"><?php bloginfo('name'); ?></a></h1>
-                <p><?php bloginfo('description'); ?></p>
-            </div>
+        <header class="site-header text-center">
+            <h1><a href="<?= esc_url(home_url()); ?>"><?php bloginfo('name'); ?></a></h1>
+            <p><?php bloginfo('description'); ?></p>
         </header>
 
-        <main class="site-main">
-            <div class="container clearfix">
-                <div ng-view></div>
-            </div>
+        <main class="site-main clearfix">
+            <div ng-view></div>
         </main>
 
         <footer class="site-footer">
-            <div class="container">
-                &copy; Copyright <?= date('Y'); ?>
-            </div>
+            &copy; Copyright <?= date('Y'); ?>
         </footer>
 
     </div>

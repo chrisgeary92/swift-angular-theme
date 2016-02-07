@@ -37,6 +37,7 @@ if (!function_exists('swift_enqueue_assets')) {
             'site_name' => get_bloginfo('name')
         ]);
 
+        wp_enqueue_style('swift-fonts', '//fonts.googleapis.com/css?family=Bitter:700|Lato');
         wp_enqueue_style('swift-css', get_stylesheet_uri());
     }
     add_action('wp_enqueue_scripts', 'swift_enqueue_assets');
