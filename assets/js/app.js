@@ -120,7 +120,7 @@ app.factory('$wpService', ['$http', function($http) {
     }
 
     WpService.getPostBySlug = function(slug) {
-        $http.get(swift.root + '/wp-json/wp/v2/posts?filter[name]=' + slug).success(function(res) {
+        $http.get(swift.root + '/wp-json/wp/v2/posts?filter[name]=' + slug, { cache: true }).success(function(res) {
             WpService.post = res[0];
             _setMetaTitle(res[0].title.rendered);
         });
@@ -130,14 +130,14 @@ app.factory('$wpService', ['$http', function($http) {
         if (WpService.categories.length) {
             return;
         }
-        return $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
+        return $http.get(swift.root + '/wp-json/wp/v2/categories', { cache: true }).success(function(res) {
             WpService.categories = res;
         });
     };
 
     WpService.getPosts = function(page) {
         page = !page ? 1 : parseInt(page);
-        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&page=' + page).success(function(res, status, headers) {
+        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&page=' + page, { cache: true }).success(function(res, status, headers) {
             _setPageTitle(page > 1 ? 'Archives ' : '', page);
             _setMetaTitle('Articles');
             _setArchivePage(res, page, headers);
@@ -146,7 +146,7 @@ app.factory('$wpService', ['$http', function($http) {
 
     WpService.getPostsInCategory = function(category, page) {
         page = !page ? 1 : parseInt(page);
-        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&filter[category_name]=' + category.slug + '&page=' + page).success(function(res, status, headers) {
+        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&filter[category_name]=' + category.slug + '&page=' + page, { cache: true }).success(function(res, status, headers) {
             _setPageTitle('Category: ' + category.name, page);
             _setMetaTitle('Category: ' + category.name);
             _setArchivePage(res, page, headers);
@@ -155,7 +155,7 @@ app.factory('$wpService', ['$http', function($http) {
 
     WpService.getSearchResults = function(s) {
         if (s.length) {
-            return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=0&filter[s]=' + s).success(function(res, status, headers) {
+            return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=0&filter[s]=' + s, { cache: true }).success(function(res, status, headers) {
                 _setPageTitle('Search: ' + s);
                 _setMetaTitle('Search: ' + s);
                 _setArchivePage(res, 1, headers);
