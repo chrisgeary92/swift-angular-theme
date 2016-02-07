@@ -143,3 +143,18 @@ input[type="text"] {
     display: block;
     width: 100%;
 }
+
+@media screen and (max-width: 970px) {
+    .container {
+        width: auto;
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+    .content, .sidebar {
+        width: auto;
+        float: none;
+    }
+    .content {
+        margin-bottom: 50px;
+    }
+}
