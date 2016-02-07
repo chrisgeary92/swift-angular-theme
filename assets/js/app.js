@@ -34,21 +34,8 @@ app.config(['$routeProvider', '$locationProvider', function($routeProvider, $loc
 
 app.controller('Index', ['$scope', '$http', '$routeParams', '$wpService', function($scope, $http, $routeParams, $wpService) {
     $wpService.getAllCategories();
+    $wpService.getPosts($routeParams.page);
     $scope.data = $wpService;
-
-    var currentPage = !$routeParams.page ? 1 : parseInt($routeParams.page);
-
-    var request = swift.root + '/wp-json/wp/v2/posts?per_page=4';
-
-    if ($routeParams.page) {
-        request += '&page=' + $routeParams.page;
-    }
-
-    $http.get(request).success(function(res, status, headers) {
-        $scope.posts = res;
-        $scope.currentPage = currentPage;
-        $scope.totalPages = headers('x-wp-totalpages');
-    });
 }]);
 
 app.controller('404', function() {
@@ -57,28 +44,10 @@ app.controller('404', function() {
 
 app.controller('Category', ['$scope', '$http', '$routeParams', '$wpService', function($scope, $http, $routeParams, $wpService) {
     $wpService.getAllCategories();
-    $scope.data = $wpService;
-
     $http.get(swift.root + '/wp-json/wp/v2/categories?slug=' + $routeParams.category).success(function(res) {
-        $scope.current_category = res[0];
-        document.querySelector('title').innerHTML = 'Category: ' + res[0].name + ' | ' + swift.site_name;
-
-        var currentPage = !$routeParams.page ? 1 : parseInt($routeParams.page);
-
-        var request = swift.root + '/wp-json/wp/v2/posts?per_page=4&filter[category_name]=' + res[0].slug;
-
-        if ($routeParams.page) {
-            request += '&page=' + $routeParams.page;
-        }
-
-        $http.get(request).success(function(res, status, headers) {
-            $scope.posts = res;
-            $scope.currentPage = currentPage;
-            $scope.totalPages = headers('x-wp-totalpages');
-        });
+        $wpService.getPostsInCategory(res[0], $routeParams.page);
     });
-
-
+    $scope.data = $wpService;
 }]);
 
 app.controller('Single', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
@@ -98,16 +67,14 @@ app.directive('swiftSearchForm', function() {
     return {
         restrict: 'E', // E = element, A = attribute, C = classname
         templateUrl: swift.templates + '/search-form.html',
-        controller: function($scope, $http) {
+        controller: ['$scope', '$http', '$wpService', function($scope, $http, $wpService) {
             $scope.filter = {
                 s: ''
             };
             $scope.search = function() {
-                $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=-1&filter[s]=' + $scope.filter.s).success(function(res) {
-                    $scope.posts = res;
-                });
+                $wpService.getSearchResults($scope.filter.s);
             };
-        }
+        }]
     };
 });
 
@@ -132,8 +99,17 @@ app.directive('postsNavLink', function() {
 
 app.factory('$wpService', ['$http', function($http) {
     var WpService = {
-        categories: []
+        categories: [],
+        posts: [],
+        currentPage: 1,
+        totalPages: 1
     };
+
+    function _setArchivePage(posts, page, headers) {
+        WpService.posts = posts;
+        WpService.currentPage = page;
+        WpService.totalPages = headers('x-wp-totalpages');
+    }
 
     WpService.getAllCategories = function() {
         if (WpService.categories.length) {
@@ -141,6 +117,26 @@ app.factory('$wpService', ['$http', function($http) {
         }
         return $http.get(swift.root + '/wp-json/wp/v2/categories').success(function(res) {
             WpService.categories = res;
+        });
+    };
+
+    WpService.getPosts = function(page) {
+        page = !page ? 1 : parseInt(page);
+        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&page=' + page).success(function(res, status, headers) {
+            _setArchivePage(res, page, headers);
+        });
+    };
+
+    WpService.getSearchResults = function(s) {
+        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=-1&filter[s]=' + s).success(function(res, status, headers) {
+            _setArchivePage(res, 1, headers);
+        });
+    };
+
+    WpService.getPostsInCategory = function(category, page) {
+        page = !page ? 1 : parseInt(page);
+        return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&filter[category_name]=' + category.name + '&page=' + page).success(function(res, status, headers) {
+            _setArchivePage(res, page, headers);
         });
     };
 
