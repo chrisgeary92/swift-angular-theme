@@ -50,11 +50,9 @@ app.controller('Category', ['$scope', '$http', '$routeParams', '$wpService', fun
     $scope.data = $wpService;
 }]);
 
-app.controller('Single', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
-    $http.get(swift.root + '/wp-json/wp/v2/posts?filter[name]=' + $routeParams.slug).success(function(res) {
-        $scope.post = res[0];
-        _setMetaTitle(res[0].title.rendered);
-    });
+app.controller('Single', ['$scope', '$http', '$routeParams', '$wpService', function($scope, $http, $routeParams, $wpService) {
+    $wpService.getPostBySlug($routeParams.slug);
+    $scope.data = $wpService;
 }]);
 
 app.filter('toTrusted', ['$sce', function($sce) {
@@ -120,6 +118,13 @@ app.factory('$wpService', ['$http', function($http) {
     function _setMetaTitle(title) {
         document.querySelector('title').innerHTML = (title.length ? title + ' | ' : '') + swift.site_name;
     }
+
+    WpService.getPostBySlug = function(slug) {
+        $http.get(swift.root + '/wp-json/wp/v2/posts?filter[name]=' + slug).success(function(res) {
+            WpService.post = res[0];
+            _setMetaTitle(res[0].title.rendered);
+        });
+    };
 
     WpService.getAllCategories = function() {
         if (WpService.categories.length) {
