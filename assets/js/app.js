@@ -53,7 +53,7 @@ app.controller('Category', ['$scope', '$http', '$routeParams', '$wpService', fun
 app.controller('Single', ['$scope', '$http', '$routeParams', function($scope, $http, $routeParams) {
     $http.get(swift.root + '/wp-json/wp/v2/posts?filter[name]=' + $routeParams.slug).success(function(res) {
         $scope.post = res[0];
-        document.querySelector('title').innerHTML = res[0].title.rendered + ' | ' + swift.site_name;
+        _setMetaTitle(res[0].title.rendered);
     });
 }]);
 
@@ -117,6 +117,10 @@ app.factory('$wpService', ['$http', function($http) {
         WpService.pageTitle = name + (page > 1 ? ' (Page: ' + page + ')' : '');
     }
 
+    function _setMetaTitle(title) {
+        document.querySelector('title').innerHTML = (title.length ? title + ' | ' : '') + swift.site_name;
+    }
+
     WpService.getAllCategories = function() {
         if (WpService.categories.length) {
             return;
@@ -129,7 +133,8 @@ app.factory('$wpService', ['$http', function($http) {
     WpService.getPosts = function(page) {
         page = !page ? 1 : parseInt(page);
         return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&page=' + page).success(function(res, status, headers) {
-            _setPageTitle('', page);
+            _setPageTitle(page > 1 ? 'Archives ' : '', page);
+            _setMetaTitle('Articles');
             _setArchivePage(res, page, headers);
         });
     };
@@ -138,6 +143,7 @@ app.factory('$wpService', ['$http', function($http) {
         page = !page ? 1 : parseInt(page);
         return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=4&filter[category_name]=' + category.slug + '&page=' + page).success(function(res, status, headers) {
             _setPageTitle('Category: ' + category.name, page);
+            _setMetaTitle('Category: ' + category.name);
             _setArchivePage(res, page, headers);
         });
     };
@@ -146,6 +152,7 @@ app.factory('$wpService', ['$http', function($http) {
         if (s.length) {
             return $http.get(swift.root + '/wp-json/wp/v2/posts?per_page=0&filter[s]=' + s).success(function(res, status, headers) {
                 _setPageTitle('Search: ' + s);
+                _setMetaTitle('Search: ' + s);
                 _setArchivePage(res, 1, headers);
             });
         }
