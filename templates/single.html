@@ -1,6 +1,17 @@
 <article class="entry entry-post entry-single">
     <header class="entry-header">
+
         <h1 ng-bind-html="data.post.title.rendered | toTrusted"></h1>
+    
+        <div class="entry-featured" ng-show="data.post.swift.featured_media.sizes.banner">
+            <img
+                src="{{ data.post.swift.featured_media.sizes.banner.src }}"
+                height="{{ data.post.swift.featured_media.sizes.banner.height }}"
+                width="{{ data.post.swift.featured_media.sizes.banner.width }}"
+                alt="{{ data.post.swift.featured_media.alt_text }}"
+            >
+        </div>
+
     </header>
     <div ng-bind-html="data.post.content.rendered | toTrusted"></div>
 </article>
