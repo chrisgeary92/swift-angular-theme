@@ -4,5 +4,6 @@
 /.sass-cache
 
 /style.css
+/assets/js/app.min.js
 
 .DS_Store
