@@ -32,7 +32,7 @@ if (!function_exists('swift_enqueue_assets')) {
         wp_enqueue_script('angularjs-route', '//ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-route.min.js');
         wp_enqueue_script('angularjs-sanitize', '//ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-sanitize.min.js');
 
-        wp_enqueue_script('swift-app', $theme.'/assets/js/app.js', ['angularjs', 'angularjs-route', 'angularjs-sanitize']);
+        wp_enqueue_script('swift-app', $theme.'/assets/js/app.min.js', ['angularjs', 'angularjs-route', 'angularjs-sanitize']);
 
         wp_localize_script('swift-app', 'swift', [
             'root' => esc_url(home_url()),
@@ -49,7 +49,7 @@ if (!function_exists('swift_enqueue_assets')) {
 if (!function_exists('swift_register_rest_fields')) {
     /**
      * Register extra field(s) for our REST endpoints
-     * 
+     *
      * @return void
      */
     function swift_register_rest_fields()
@@ -65,7 +65,7 @@ if (!function_exists('swift_register_rest_fields')) {
 if (!function_exists('swift_register_rest_field_for_post')) {
     /**
      * Register extra API field(s) for the post post-type
-     * 
+     *
      * @param array $object
      * @param string $field_name
      * @param WP_REST_Request $request
